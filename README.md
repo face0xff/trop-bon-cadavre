@@ -46,7 +46,5 @@ python main.py --token "<REDACTED>"
 
 ### Issues
 
-* **How to send alerts to the current player (such as "you have x seconds left")?**
-  * Need an asynchronous background task?
 * Anyone can invite the bot to another group and make it unusable by starting a very long game
   * Provide an option to restrict the bot to a certain channel id?

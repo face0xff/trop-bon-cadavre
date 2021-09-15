@@ -16,7 +16,7 @@ Sometimes it surprisingly makes sense, sometimes it does not at all; but most of
 ## Commands
 
 * `/new <number of messages> <timeout in seconds>` — Create a new game
-* `/join` — Join the game 
+* `/join` — Join the game
 * `/start` — Start the game (only for the person who created it)
 * `/cancel` — Cancel a game before it starts (only for the person who created it)
 
@@ -26,12 +26,13 @@ Sometimes it surprisingly makes sense, sometimes it does not at all; but most of
 python3 -m venv env
 source env/bin/activate
 pip install -r requirements.txt
-python main.py --name "Trop Bon Cadavre" --token "<REDACTED>"
+python main.py --token "<REDACTED>"
 ```
 
 ## Todo
 
-* Concurrent games across channels
+### Features
+
 * Periodically save the story into a file, in case something wrong happens
 * Automatically generate a PDF at the end of a game
 * Let a player skip their turn
@@ -41,3 +42,11 @@ python main.py --name "Trop Bon Cadavre" --token "<REDACTED>"
   * Who timed out the most
   * Who's the slowest or the fastest in average
   * ...
+* Concurrent games across channels
+
+### Issues
+
+* **How to send alerts to the current player (such as "you have x seconds left")?**
+  * Need an asynchronous background task?
+* Anyone can invite the bot to another group and make it unusable by starting a very long game
+  * Provide an option to restrict the bot to a certain channel id?

@@ -1,4 +1,5 @@
 from enum import Enum
+import html
 import random
 import time
 
@@ -20,7 +21,7 @@ def turns(players):
     random.shuffle(U1)
     while True:
         random.shuffle(U2)
-        if U1[-1] != U2[0]:
+        if U1[-1]["id"] != U2[0]["id"]:
             break
 
     while True:
@@ -32,17 +33,18 @@ def turns(players):
         U1, U2 = U2, U1
         while True:
             random.shuffle(U2)
-            if U1[-1] != U2[0]:
+            if U1[-1]["id"] != U2[0]["id"]:
                 break
 
 
 class Game:
-    def __init__(self, n_messages=10, timeout=300):
+    def __init__(self, n_messages, timeout, chat_id):
         self.n_messages = n_messages
         self.timeout = timeout
 
         self.players = []
         self.player_list_message = None
+        self.chat_id = chat_id
 
         self.last_time = -1
         self.player_notified_half = False
@@ -69,9 +71,13 @@ class Game:
         self.last_time = time.time()
         return self.current_player, self.next_player
 
-    def play_turn(self, player, message):
-        # Todo
-        pass
+    def play_turn(self, message):
+        self.messages.append(
+            {
+                "username": self.current_player,
+                "text": message,
+            }
+        )
 
     def next_turn(self):
         self.player_notified_half = False
@@ -79,3 +85,46 @@ class Game:
         self.current_player, self.next_player = next(self.playlist)
         self.last_time = time.time()
         return self.current_player, self.next_player
+
+    def end(self):
+        self.status = State.ENDED
+
+    def generate_html(self):
+        authors = ", ".join(player["username"] for player in self.players)
+        story = ""
+        for message in self.messages:
+            message_ = html.escape(message["text"]).replace("\n", "<br />")
+            story += f"<p>{message_}</p>\n"
+
+        content = """<html>
+<head>
+    <title>Trop Bon Cadavre</title>
+    <style>
+    body {
+        text-align: justify;
+    }
+    .col {
+        width: 50%%;
+        margin: 0 auto;
+    }
+    @media screen and (max-width: 640px) {
+        .col {
+            width: 100%%;
+        }
+    }
+    </style>
+</head>
+<body>
+<div class="col">
+<h1>Trop Bon Cadavre</h1>
+<p><strong>Authors: %s</strong></p>
+%s
+</div>
+</body>
+</html>
+""" % (
+            authors,
+            story,
+        )
+
+        return content

@@ -34,7 +34,9 @@ python main.py --token "<REDACTED>"
 ### Features
 
 * Periodically save the story into a file, in case something wrong happens
-* Automatically generate a PDF at the end of a game
+* Add inline keyboard button to slide into the bot's DM
+* Allow players (or only creator) to choose a name for the story
+* Allow receiving split messages at once for longer messages
 * Let a player skip their turn
 * Show statistics at the end of a game
   * Number of words
@@ -43,6 +45,7 @@ python main.py --token "<REDACTED>"
   * Who's the slowest or the fastest in average
   * ...
 * Concurrent games across channels
+* Send messages as image captions to include images in the final story
 
 ### Issues
 

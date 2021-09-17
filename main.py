@@ -1,8 +1,8 @@
 import argparse
+import os
 import pathlib
 import sys
 import telebot
-import tempfile
 import time
 import traceback
 
@@ -211,7 +211,7 @@ def get_story_message(message):
     global game
     global message_buffer, message_buffer_time
 
-    if game is None or game.status != State.PLAYING:
+    if game is None or game.status not in (State.PLAYING, State.ENDED):
         return
 
     if game.current_player["id"] != message.from_user.id:
@@ -230,7 +230,53 @@ def game_poll():
     global game
     global message_buffer, message_buffer_time
 
-    if game is None or game.status != State.PLAYING:
+    if game is None:
+        return
+
+    if game.status == State.ENDED and len(message_buffer) > 0:
+        title = message_buffer[0]
+        message_buffer = []
+        message_buffer_time = -1
+
+        if len(title) > 50:
+            bot.send_message(
+                game.current_player["id"],
+                "Title is too long. Please try again with something else!",
+            )
+            return
+
+        title = (
+            "".join([c for c in title if c.isalpha() or c.isdigit() or c in " -_'\"()"])
+            .rstrip()
+            .lstrip()
+        )
+        if len(title) <= 0:
+            bot.send_message(
+                game.current_player["id"],
+                "Your title contains too many weird characters. Please try again.",
+            )
+            return
+
+        bot.send_message(game.current_player["id"], "Thank you!")
+        bot.send_message(
+            game.chat_id,
+            "The game has ended! Exporting the story into an HTML file...",
+        )
+
+        game.set_title(title)
+
+        content = game.generate_html()
+        filename = os.path.join("/tmp", f"{title}-{game.nonce}.html")
+        with open(filename, "w") as f:
+            f.write(content)
+
+        bot.send_document(game.chat_id, open(filename, "rb"))
+
+        del game
+        game = None
+        return
+
+    if game.status != State.PLAYING:
         return
 
     if game.timeout >= 120:
@@ -273,23 +319,19 @@ def game_poll():
         )
 
         if len(game.messages) == game.n_messages:
+            # Story has ended, ask next player for a title
             game.end()
-
+            current_player, _ = game.next_turn()
+            bot.send_message(
+                current_player["id"],
+                """*You were to chosen to give a title to the story!*
+Give me a catchy title that's no more than 50 characters.""",
+                parse_mode="Markdown",
+            )
             bot.send_message(
                 game.chat_id,
-                "The game has ended! Exporting the story into an HTML file...",
+                f"Asking @{current_player['username']} to come up with a catchy title to the story!",
             )
-
-            content = game.generate_html()
-            temp = tempfile.NamedTemporaryFile(delete=False, dir="/tmp", suffix=".html")
-            temp.write(content.encode())
-            filename = temp.name
-            temp.close()
-            bot.send_document(game.chat_id, open(filename, "rb"))
-
-            del game
-            game = None
-
             return
 
         next_turn()

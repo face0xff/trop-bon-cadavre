@@ -37,9 +37,6 @@ python main.py --token "<Your Telegram Bot Token>"
 ### Features
 
 * Add possibility to leave a game that hasn't started yet (the creator can't leave)
-* Allow players (or only creator) to choose a name for the story
-* Concurrent games across channels
-* Send messages as image captions to include images in the final story
 
 ### Issues
 

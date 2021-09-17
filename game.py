@@ -56,15 +56,21 @@ class Game:
         self.next_player = None
         self.playlist = None
 
+        self.title = ""
         self.messages = []
+
+        self.nonce = random.randbytes(3).hex()
         self.savedir = os.path.join(
             savedir,
-            f"{int(time.time())}-{random.randbytes(3).hex()}.txt",
+            f"{int(time.time())}-{self.nonce}.txt",
         )
 
         self.timeouts = {}
 
         self.status = State.WAITING
+
+    def set_title(self, title):
+        self.title = title
 
     def player_join(self, player):
         self.players.append(player)
@@ -158,7 +164,7 @@ Slowest player: {s["slowest_player"]} ({s["slowest_mean_duration"]} seconds in a
 
         content = """<html>
 <head>
-    <title>Trop Bon Cadavre</title>
+    <title>Trop Bon Cadavre : %s</title>
     <style>
     body {
         text-align: justify;
@@ -176,7 +182,7 @@ Slowest player: {s["slowest_player"]} ({s["slowest_mean_duration"]} seconds in a
 </head>
 <body>
 <div class="col">
-<h1>Trop Bon Cadavre</h1>
+<h1>%s</h1>
 <p><strong>Authors: %s</strong></p>
 <hr />
 <p>
@@ -189,6 +195,8 @@ Slowest player: {s["slowest_player"]} ({s["slowest_mean_duration"]} seconds in a
 </body>
 </html>
 """ % (
+            html.escape(self.title),
+            html.escape(self.title),
             authors,
             statistics,
             story,

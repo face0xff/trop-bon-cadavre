@@ -33,7 +33,6 @@ python main.py --token "<REDACTED>"
 
 ### Features
 
-* Periodically save the story into a file, in case something wrong happens
 * Add inline keyboard button to slide into the bot's DM
 * Allow players (or only creator) to choose a name for the story
 * Allow receiving split messages at once for longer messages

@@ -1,5 +1,6 @@
 from enum import Enum
 import html
+import os
 import random
 import time
 
@@ -38,7 +39,7 @@ def turns(players):
 
 
 class Game:
-    def __init__(self, n_messages, timeout, chat_id):
+    def __init__(self, n_messages, timeout, chat_id, savedir):
         self.n_messages = n_messages
         self.timeout = timeout
 
@@ -55,6 +56,10 @@ class Game:
         self.playlist = None
 
         self.messages = []
+        self.savedir = os.path.join(
+            savedir,
+            f"{int(time.time())}-{random.randbytes(3).hex()}.txt",
+        )
 
         self.status = State.WAITING
 
@@ -78,6 +83,8 @@ class Game:
                 "text": message,
             }
         )
+        with open(self.savedir, "a") as f:
+            f.write(f"{message}\n\n")
 
     def next_turn(self):
         self.player_notified_half = False

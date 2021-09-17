@@ -1,5 +1,5 @@
 import argparse
-import os
+import pathlib
 import sys
 import telebot
 import tempfile
@@ -12,12 +12,18 @@ from timer import RepeatedTimer
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--token", help="Bot token")
-# parser.add_argument("--savedir", default="saves", help="Directory where messages are saved")
+parser.add_argument(
+    "--savedir", default="saves", help="Directory where messages are saved"
+)
 
 args = parser.parse_args()
 
 if not args.token:
     print("[x] Please provide bot token.")
+    sys.exit(-1)
+
+if not pathlib.Path(args.savedir).is_dir():
+    print("[x] Please provide a valid directory for savedir.")
     sys.exit(-1)
 
 bot = telebot.TeleBot(args.token, threaded=False)
@@ -59,7 +65,7 @@ def new_game(message):
         bot.reply_to(message, "Timeout must be between 10 seconds and 1 week.")
         return
 
-    game = Game(n_messages, timeout, message.chat.id)
+    game = Game(n_messages, timeout, message.chat.id, args.savedir)
     game.player_join(
         {
             "username": message.from_user.username,

@@ -23,17 +23,20 @@ Sometimes it surprisingly makes sense, sometimes it does not at all; but most of
 
 ## Run the bot
 
+Requires at least Python 3.9.
+
 ```bash
 python3 -m venv env
 source env/bin/activate
 pip install -r requirements.txt
-python main.py --token "<REDACTED>"
+python main.py --token "<Your Telegram Bot Token>"
 ```
 
 ## Todo
 
 ### Features
 
+* Add possibility to leave a game that hasn't started yet (the creator can't leave)
 * Allow players (or only creator) to choose a name for the story
 * Concurrent games across channels
 * Send messages as image captions to include images in the final story

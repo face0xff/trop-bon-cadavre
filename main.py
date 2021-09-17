@@ -79,12 +79,21 @@ def new_game(message):
     bot.send_message(
         game.chat_id,
         f"""@{message.from_user.username} has started a new Trop Bon Cadavre game!
-It will last {n_messages} messages, and each player will have {timeout} seconds to answer.
-*Send me /join in DM to be part of the game.*
+It will last *{n_messages} messages*, and each player will have *{timeout} seconds* to answer.
 
 @{message.from_user.username}: you can use `/start` to start the game once everyone joined, or `/cancel` to cancel it.
 """,
         parse_mode="Markdown",
+        reply_markup=telebot.types.InlineKeyboardMarkup(
+            keyboard=[
+                [
+                    telebot.types.InlineKeyboardButton(
+                        text="Send me /join in DM",
+                        url=f"t.me/{bot.get_me().username}",
+                    )
+                ]
+            ]
+        ),
     )
 
     game.player_list_message = bot.send_message(

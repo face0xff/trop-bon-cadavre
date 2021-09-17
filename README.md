@@ -33,7 +33,6 @@ python main.py --token "<REDACTED>"
 
 ### Features
 
-* Add inline keyboard button to slide into the bot's DM
 * Allow players (or only creator) to choose a name for the story
 * Let a player skip their turn
 * Show statistics at the end of a game

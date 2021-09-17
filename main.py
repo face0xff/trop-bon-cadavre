@@ -248,7 +248,7 @@ def game_poll():
                 game.player_notified_thirty_seconds = True
                 bot.send_message(game.current_player["id"], "You have 30 seconds left!")
 
-    if not game.player_notified_thirty_seconds:
+    if not game.player_notified_five_seconds:
         if time.time() - game.last_time > game.timeout - 5:
             game.player_notified_five_seconds = True
             bot.send_message(game.current_player["id"], "You have 5 seconds left!")

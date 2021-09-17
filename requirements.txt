@@ -2,7 +2,6 @@ black==21.9b0
 certifi==2021.5.30
 charset-normalizer==2.0.5
 click==8.0.1
-fpdf==1.7.2
 idna==3.2
 mypy-extensions==0.4.3
 pathspec==0.9.0

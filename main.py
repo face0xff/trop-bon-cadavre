@@ -46,6 +46,25 @@ def is_private(message):
     return message.chat.type == "private"
 
 
+def next_turn(start=False):
+    global game
+
+    current_player, next_player = game.start() if start else game.next_turn()
+    if len(game.messages) > 0:
+        send_large_message(
+            current_player["id"],
+            f"*Your turn to write message {len(game.messages) + 1}/{game.n_messages}.*\n\n{game.messages[-1]['text']}",
+        )
+    else:
+        bot.send_message(
+            current_player["id"],
+            "*You have the honor and the great responsibility to start the story with the first message!*",
+            parse_mode="Markdown",
+        )
+    if len(game.messages) < game.n_messages - 1:
+        bot.send_message(next_player["id"], "Get ready. Next turn is yours!")
+
+
 @bot.message_handler(commands=["new"], func=is_public)
 def new_game(message):
     global game
@@ -141,14 +160,7 @@ def start_game(message):
         game.chat_id, "The game has started! Waiting for the first player's message."
     )
 
-    current_player, next_player = game.start()
-    bot.send_message(
-        current_player["id"],
-        "*You have the honor and the great responsibility to start the story with the first message!*",
-        parse_mode="Markdown",
-    )
-    if len(game.messages) < game.n_messages - 1:
-        bot.send_message(next_player["id"], "Get ready. Next turn is yours!")
+    next_turn(start=True)
 
 
 @bot.message_handler(commands=["cancel"], func=is_public)
@@ -166,6 +178,24 @@ def cancel_game(message):
 
     del game
     game = None
+
+
+@bot.message_handler(commands=["skip"], func=is_private)
+def skip_turn(message):
+    global game
+
+    if game is None or game.status != State.PLAYING:
+        return
+
+    if message.from_user.id != game.current_player["id"]:
+        return
+
+    bot.send_message(message.from_user.id, "You skipped your turn.")
+    bot.send_message(
+        game.chat_id, "Someone skipped their turn. Asking the next player..."
+    )
+
+    next_turn()
 
 
 @bot.message_handler(func=is_private)
@@ -215,20 +245,7 @@ def game_poll():
         bot.send_message(
             game.chat_id, "Someone failed to answer in time. Asking the next player..."
         )
-        current_player, next_player = game.next_turn()
-        if len(game.messages) > 0:
-            send_large_message(
-                current_player["id"],
-                f"*Your turn to write message {len(game.messages) + 1}/{game.n_messages}.*\n\n{game.messages[-1]['text']}",
-            )
-        else:
-            bot.send_message(
-                current_player["id"],
-                "*You have the honor and the great responsibility to start the story with the first message!*",
-                parse_mode="Markdown",
-            )
-        if len(game.messages) < game.n_messages - 1:
-            bot.send_message(next_player["id"], "Get ready. Next turn is yours!")
+        next_turn()
         return
 
     if len(message_buffer) > 0 and time.time() >= message_buffer_time + 0.25 * 2:
@@ -261,14 +278,7 @@ def game_poll():
 
             return
 
-        current_player, next_player = game.next_turn()
-
-        send_large_message(
-            current_player["id"],
-            f"*Your turn to write message {len(game.messages) + 1}/{game.n_messages}.*\n\n{game.messages[-1]['text']}",
-        )
-        if len(game.messages) < game.n_messages - 1:
-            bot.send_message(next_player["id"], "Get ready. Next turn is yours!")
+        next_turn()
 
 
 rt = RepeatedTimer(0.5, game_poll)

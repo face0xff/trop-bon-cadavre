@@ -19,6 +19,7 @@ Sometimes it surprisingly makes sense, sometimes it does not at all; but most of
 * `/join` — Join the game
 * `/start` — Start the game (only for the person who created it)
 * `/cancel` — Cancel a game before it starts (only for the person who created it)
+* `/skip` — Skip your turn
 
 ## Run the bot
 

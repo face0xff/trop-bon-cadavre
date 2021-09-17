@@ -29,6 +29,9 @@ if not pathlib.Path(args.savedir).is_dir():
 bot = telebot.TeleBot(args.token, threaded=False)
 game = None
 
+message_buffer = []
+message_buffer_time = -1
+
 
 def send_large_message(chat_id, text):
     for text_ in telebot.util.smart_split(text, chars_per_string=3000):
@@ -159,6 +162,7 @@ def cancel_game(message):
 @bot.message_handler(func=is_private)
 def get_story_message(message):
     global game
+    global message_buffer, message_buffer_time
 
     if game is None or game.status != State.PLAYING:
         return
@@ -166,44 +170,18 @@ def get_story_message(message):
     if game.current_player["id"] != message.from_user.id:
         return
 
-    game.play_turn(message.text)
+    if message_buffer_time == -1:
+        message_buffer_time = time.time()
 
-    bot.send_message(game.current_player["id"], "Your message was registered.")
-    bot.send_message(
-        game.chat_id, f"Message {len(game.messages)}/{game.n_messages} registered!"
-    )
-
-    if len(game.messages) == game.n_messages:
-        game.end()
-
-        bot.send_message(
-            game.chat_id, "The game has ended! Exporting the story into an HTML file..."
-        )
-
-        content = game.generate_html()
-        temp = tempfile.NamedTemporaryFile(delete=False, dir="/tmp", suffix=".html")
-        temp.write(content.encode())
-        filename = temp.name
-        temp.close()
-        bot.send_document(game.chat_id, open(filename, "rb"))
-
-        del game
-        game = None
-
+    # Allow 250ms interval to get all messages from player in case they were split
+    if time.time() < message_buffer_time + 0.25:
+        message_buffer.append(message.text)
         return
-
-    current_player, next_player = game.next_turn()
-
-    send_large_message(
-        current_player["id"],
-        f"*Your turn to write message {len(game.messages) + 1}/{game.n_messages}.*\n\n{game.messages[-1]['text']}",
-    )
-    if len(game.messages) < game.n_messages - 1:
-        bot.send_message(next_player["id"], "Get ready. Next turn is yours!")
 
 
 def game_poll():
     global game
+    global message_buffer, message_buffer_time
 
     if game is None or game.status != State.PLAYING:
         return
@@ -242,9 +220,49 @@ def game_poll():
             )
         if len(game.messages) < game.n_messages - 1:
             bot.send_message(next_player["id"], "Get ready. Next turn is yours!")
+        return
+
+    if len(message_buffer) > 0 and time.time() >= message_buffer_time + 0.25 * 2:
+        game.play_turn(" ".join(message_buffer))
+        message_buffer = []
+        message_buffer_time = -1
+
+        bot.send_message(game.current_player["id"], "Your message was registered.")
+        bot.send_message(
+            game.chat_id, f"Message {len(game.messages)}/{game.n_messages} registered!"
+        )
+
+        if len(game.messages) == game.n_messages:
+            game.end()
+
+            bot.send_message(
+                game.chat_id,
+                "The game has ended! Exporting the story into an HTML file...",
+            )
+
+            content = game.generate_html()
+            temp = tempfile.NamedTemporaryFile(delete=False, dir="/tmp", suffix=".html")
+            temp.write(content.encode())
+            filename = temp.name
+            temp.close()
+            bot.send_document(game.chat_id, open(filename, "rb"))
+
+            del game
+            game = None
+
+            return
+
+        current_player, next_player = game.next_turn()
+
+        send_large_message(
+            current_player["id"],
+            f"*Your turn to write message {len(game.messages) + 1}/{game.n_messages}.*\n\n{game.messages[-1]['text']}",
+        )
+        if len(game.messages) < game.n_messages - 1:
+            bot.send_message(next_player["id"], "Get ready. Next turn is yours!")
 
 
-rt = RepeatedTimer(1, game_poll)
+rt = RepeatedTimer(0.5, game_poll)
 
 try:
     bot.polling()

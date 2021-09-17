@@ -35,7 +35,6 @@ python main.py --token "<REDACTED>"
 
 * Add inline keyboard button to slide into the bot's DM
 * Allow players (or only creator) to choose a name for the story
-* Allow receiving split messages at once for longer messages
 * Let a player skip their turn
 * Show statistics at the end of a game
   * Number of words

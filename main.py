@@ -58,7 +58,7 @@ def next_turn(start=False):
     else:
         bot.send_message(
             current_player["id"],
-            "*You have the honor and the great responsibility to start the story with the first message!*\nYou have {game.timeout} seconds.",
+            f"*You have the honor and the great responsibility to start the story with the first message!*\nYou have {game.timeout} seconds.",
             parse_mode="Markdown",
         )
     if len(game.messages) < game.n_messages - 1:

@@ -126,8 +126,12 @@ class Game:
             "words": len(" ".join(m["text"] for m in self.messages).split()),
             "most_characters_count": max(lengths.values()),
             "most_characters_player": max(lengths, key=lengths.get),
-            "most_timeouts_count": max(self.timeouts.values()),
-            "most_timeouts_player": max(self.timeouts, key=self.timeouts.get),
+            "most_timeouts_count": max(self.timeouts.values())
+            if self.timeouts
+            else None,
+            "most_timeouts_player": max(self.timeouts, key=self.timeouts.get)
+            if self.timeouts
+            else None,
             "fastest_mean_duration": min(mean_times.values()),
             "fastest_player": min(mean_times, key=mean_times.get),
             "slowest_mean_duration": max(mean_times.values()),
@@ -141,10 +145,11 @@ class Game:
         statistics = f"""
 Number of words: {s["words"]}<br />
 Wrote the most: {s["most_characters_player"]} ({s["most_characters_count"]} characters)<br />
-Most timeouts: {s["most_timeouts_player"]} ({s["most_timeouts_count"]})<br />
 Fastest player: {s["fastest_player"]} ({s["fastest_mean_duration"]} seconds in average)<br />
 Slowest player: {s["slowest_player"]} ({s["slowest_mean_duration"]} seconds in average)<br />
 """
+        if self.timeouts:
+            statistics += f"Most timeouts: {s['most_timeouts_player']} ({s['most_timeouts_count']})<br />"
 
         story = ""
         for message in self.messages:

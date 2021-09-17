@@ -50,6 +50,7 @@ class Game:
         self.last_time = -1
         self.player_notified_half = False
         self.player_notified_thirty_seconds = False
+        self.player_notified_five_seconds = False
 
         self.current_player = None
         self.next_player = None
@@ -92,6 +93,7 @@ class Game:
     def next_turn(self):
         self.player_notified_half = False
         self.player_notified_thirty_seconds = False
+        self.player_notified_five_seconds = False
         self.current_player, self.next_player = next(self.playlist)
         self.last_time = time.time()
         return self.current_player, self.next_player
@@ -126,10 +128,10 @@ class Game:
             "most_characters_player": max(lengths, key=lengths.get),
             "most_timeouts_count": max(self.timeouts.values()),
             "most_timeouts_player": max(self.timeouts, key=self.timeouts.get),
-            "fastest_mean_duration": max(mean_times.values()),
-            "fastest_player": max(mean_times, key=mean_times.get),
-            "slowest_mean_duration": min(mean_times.values()),
-            "slowest_player": min(mean_times, key=mean_times.get),
+            "fastest_mean_duration": min(mean_times.values()),
+            "fastest_player": min(mean_times, key=mean_times.get),
+            "slowest_mean_duration": max(mean_times.values()),
+            "slowest_player": max(mean_times, key=mean_times.get),
         }
 
     def generate_html(self):

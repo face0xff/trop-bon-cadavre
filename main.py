@@ -53,12 +53,12 @@ def next_turn(start=False):
     if len(game.messages) > 0:
         send_large_message(
             current_player["id"],
-            f"*Your turn to write message {len(game.messages) + 1}/{game.n_messages}.*\n\n{game.messages[-1]['text']}",
+            f"*Your turn to write message {len(game.messages) + 1}/{game.n_messages}.*\nYou have {game.timeout} seconds.\n\n{game.messages[-1]['text']}",
         )
     else:
         bot.send_message(
             current_player["id"],
-            "*You have the honor and the great responsibility to start the story with the first message!*",
+            "*You have the honor and the great responsibility to start the story with the first message!*\nYou have {game.timeout} seconds.",
             parse_mode="Markdown",
         )
     if len(game.messages) < game.n_messages - 1:
@@ -247,6 +247,11 @@ def game_poll():
             if time.time() - game.last_time > game.timeout - 30:
                 game.player_notified_thirty_seconds = True
                 bot.send_message(game.current_player["id"], "You have 30 seconds left!")
+
+    if not game.player_notified_thirty_seconds:
+        if time.time() - game.last_time > game.timeout - 5:
+            game.player_notified_five_seconds = True
+            bot.send_message(game.current_player["id"], "You have 5 seconds left!")
 
     if time.time() - game.last_time >= game.timeout:
         bot.send_message(game.current_player["id"], "Time out! You were too slow.")

@@ -35,13 +35,6 @@ python main.py --token "<REDACTED>"
 ### Features
 
 * Allow players (or only creator) to choose a name for the story
-* Let a player skip their turn
-* Show statistics at the end of a game
-  * Number of words
-  * Who wrote the most
-  * Who timed out the most
-  * Who's the slowest or the fastest in average
-  * ...
 * Concurrent games across channels
 * Send messages as image captions to include images in the final story
 

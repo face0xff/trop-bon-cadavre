@@ -61,6 +61,8 @@ class Game:
             f"{int(time.time())}-{random.randbytes(3).hex()}.txt",
         )
 
+        self.timeouts = {}
+
         self.status = State.WAITING
 
     def player_join(self, player):
@@ -79,8 +81,9 @@ class Game:
     def play_turn(self, message):
         self.messages.append(
             {
-                "username": self.current_player,
+                "player": self.current_player,
                 "text": message,
+                "duration": time.time() - self.last_time,
             }
         )
         with open(self.savedir, "a") as f:
@@ -96,8 +99,51 @@ class Game:
     def end(self):
         self.status = State.ENDED
 
+    def timed_out(self):
+        username = self.current_player["username"]
+        if username not in self.timeouts.keys():
+            self.timeouts[username] = 0
+        self.timeouts[username] += 1
+
+    def get_statistics(self):
+        times = {}
+        lengths = {}
+        for message in self.messages:
+            if message["player"]["username"] not in times.keys():
+                times[message["player"]["username"]] = []
+            if message["player"]["username"] not in lengths.keys():
+                lengths[message["player"]["username"]] = 0
+            times[message["player"]["username"]].append(message["duration"])
+            lengths[message["player"]["username"]] += len(message["text"])
+
+        mean_times = {}
+        for player in times:
+            mean_times[player] = round(sum(times[player]) / len(times[player]), 1)
+
+        return {
+            "words": len(" ".join(m["text"] for m in self.messages).split()),
+            "most_characters_count": max(lengths.values()),
+            "most_characters_player": max(lengths, key=lengths.get),
+            "most_timeouts_count": max(self.timeouts.values()),
+            "most_timeouts_player": max(self.timeouts, key=self.timeouts.get),
+            "fastest_mean_duration": max(mean_times.values()),
+            "fastest_player": max(mean_times, key=mean_times.get),
+            "slowest_mean_duration": min(mean_times.values()),
+            "slowest_player": min(mean_times, key=mean_times.get),
+        }
+
     def generate_html(self):
         authors = ", ".join(player["username"] for player in self.players)
+
+        s = self.get_statistics()
+        statistics = f"""
+Number of words: {s["words"]}<br />
+Wrote the most: {s["most_characters_player"]} ({s["most_characters_count"]} characters)<br />
+Most timeouts: {s["most_timeouts_player"]} ({s["most_timeouts_count"]})<br />
+Fastest player: {s["fastest_player"]} ({s["fastest_mean_duration"]} seconds in average)<br />
+Slowest player: {s["slowest_player"]} ({s["slowest_mean_duration"]} seconds in average)<br />
+"""
+
         story = ""
         for message in self.messages:
             message_ = html.escape(message["text"]).replace("\n", "<br />")
@@ -125,12 +171,19 @@ class Game:
 <div class="col">
 <h1>Trop Bon Cadavre</h1>
 <p><strong>Authors: %s</strong></p>
+<hr />
+<p>
+<strong>Statistics</strong><br />
+%s
+</p>
+<hr />
 %s
 </div>
 </body>
 </html>
 """ % (
             authors,
+            statistics,
             story,
         )
 

@@ -245,6 +245,7 @@ def game_poll():
         bot.send_message(
             game.chat_id, "Someone failed to answer in time. Asking the next player..."
         )
+        game.timed_out()
         next_turn()
         return
 

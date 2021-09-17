@@ -69,6 +69,10 @@ def next_turn(start=False):
 def new_game(message):
     global game
 
+    if message.from_user.username is None:
+        bot.reply_to(message, "Please set a Telegram username to perform this action.")
+        return
+
     if game is not None:
         bot.reply_to(message, "A game is already starting or has already been started.")
         return
@@ -123,6 +127,10 @@ It will last *{n_messages} messages*, and each player will have *{timeout} secon
 @bot.message_handler(commands=["join"], func=is_private)
 def join_game(message):
     global game
+
+    if message.from_user.username is None:
+        bot.reply_to(message, "Please set a Telegram username to perform this action.")
+        return
 
     if game is None or game.status != State.WAITING:
         return

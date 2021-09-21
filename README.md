@@ -41,6 +41,7 @@ Then invite the bot to a group channel.
 ### Features
 
 * Add possibility to leave a game that hasn't started yet (the creator can't leave)
+* Add possibility to host a simple HTTP server to serve the HTML export files (also better to centralize CSS, fonts...)
 
 ### Issues
 

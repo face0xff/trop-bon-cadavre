@@ -1,6 +1,7 @@
 import threading
 import time
 
+
 class RepeatedTimer(object):
     def __init__(self, interval, function, *args, **kwargs):
         self._timer = None
@@ -29,37 +30,34 @@ class RepeatedTimer(object):
         self.is_running = False
 
 
-def format_time(time:int)-> str:
-    '''
-        Formats time in seconds to string with time in weeks / days / hours / minutes /seconds
-    '''
-    formatted_string = ""
+def format_time(time: int) -> str:
+    """
+    Formats time (in seconds) to a string with time in weeks / days / hours / minutes / seconds
+    """
+    formatted_string = []
+
     seconds = time % 60
-    if seconds != 0:
-        formatted_string += " " + str(seconds) + " seconds,"
+    if seconds > 0:
+        formatted_string.append(f"{seconds} second{'s' * (seconds > 1)}")
 
-    time=time // 60
-    
+    time //= 60
     minutes = time % 60
-    if minutes != 0:
-        formatted_string += " " + str(minutes) + " minutes,"
-    
-    time=time // 60
-    
-    hours = time % 60
-    if hours != 0:
-        formatted_string += " " + str(hours) + " hours,"
-    
-    time=time // 60
-    
-    days = time % 24
-    if days != 0:
-        formatted_string += " " + str(days) + " days,"
+    if minutes > 0:
+        formatted_string.append(f"{minutes} minute{'s' * (minutes > 1)}")
 
-    time=time // 24
-    
+    time //= 60
+    hours = time % 60
+    if hours > 0:
+        formatted_string.append(f"{hours} hour{'s' * (hours > 1)}")
+
+    time //= 60
+    days = time % 24
+    if days > 0:
+        formatted_string.append(f"{days} day{'s' * (days > 1)}")
+
+    time //= 24
     weeks = time % 7
-    if weeks != 0:
-        formatted_string += " " + str(weeks) + " weeks,"
-    
-    return formatted_string.lstrip(" ").rstrip(".")
+    if weeks > 0:
+        formatted_string.append(f"{weeks} week{'s' * (weeks > 1)}")
+
+    return ", ".join(formatted_string[::-1])

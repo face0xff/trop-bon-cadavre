@@ -7,7 +7,7 @@ import time
 import traceback
 
 from game import Game, State
-from timer import RepeatedTimer
+from utils import RepeatedTimer, format_time
 
 
 parser = argparse.ArgumentParser()
@@ -53,12 +53,12 @@ def next_turn(start=False):
     if len(game.messages) > 0:
         send_large_message(
             current_player["id"],
-            f"*Your turn to write message {len(game.messages) + 1}/{game.n_messages}.*\nYou have {game.timeout} seconds.\n\n{game.messages[-1]['text']}",
+            f"*Your turn to write message {len(game.messages) + 1}/{game.n_messages}.*\nYou have {format_time(game.timeout)}.\n\n{game.messages[-1]['text']}",
         )
     else:
         bot.send_message(
             current_player["id"],
-            f"*You have the honor and the great responsibility to start the story with the first message!*\nYou have {game.timeout} seconds.",
+            f"*You have the honor and the great responsibility to start the story with the first message!*\nYou have {format_time(game.timeout)}.",
             parse_mode="Markdown",
         )
     if len(game.messages) < game.n_messages - 1:
@@ -285,7 +285,7 @@ def game_poll():
                 game.player_notified_half = True
                 bot.send_message(
                     game.current_player["id"],
-                    f"You have {game.timeout // 2} seconds left!",
+                    f"You have {format_time(game.timeout // 2)} left!",
                 )
 
     if game.timeout >= 30:

@@ -102,7 +102,7 @@ def new_game(message):
     bot.send_message(
         game.chat_id,
         f"""@{message.from_user.username} has started a new Trop Bon Cadavre game!
-It will last *{n_messages} messages*, and each player will have *{timeout} seconds* to answer.
+It will last *{n_messages} messages*, and each player will have *{format_time(timeout)}* to answer.
 
 @{message.from_user.username}: you can use `/start` to start the game once everyone joined, or `/cancel` to cancel it.
 """,

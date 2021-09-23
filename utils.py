@@ -46,17 +46,17 @@ def format_time(time: int) -> str:
         formatted_string.append(f"{minutes} minute{'s' * (minutes > 1)}")
 
     time //= 60
-    hours = time % 60
+    hours = time % 24
     if hours > 0:
         formatted_string.append(f"{hours} hour{'s' * (hours > 1)}")
 
-    time //= 60
-    days = time % 24
+    time //= 24
+    days = time % 7
     if days > 0:
         formatted_string.append(f"{days} day{'s' * (days > 1)}")
 
-    time //= 24
-    weeks = time % 7
+    time //= 7
+    weeks = time
     if weeks > 0:
         formatted_string.append(f"{weeks} week{'s' * (weeks > 1)}")
 

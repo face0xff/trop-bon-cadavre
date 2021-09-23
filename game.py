@@ -22,7 +22,13 @@ def turns(players):
     random.shuffle(U1)
     while True:
         random.shuffle(U2)
+        # No "AA" pattern
         if U1[-1]["id"] != U2[0]["id"]:
+            # No "ABA" pattern (when >= 3 players)
+            if len(players) >= 3 and (
+                U1[-1]["id"] == U2[1]["id"] or U1[-2]["id"] == U2[0]["id"]
+            ):
+                continue
             break
 
     while True:
@@ -35,6 +41,10 @@ def turns(players):
         while True:
             random.shuffle(U2)
             if U1[-1]["id"] != U2[0]["id"]:
+                if len(players) >= 3 and (
+                    U1[-1]["id"] == U2[1]["id"] or U1[-2]["id"] == U2[0]["id"]
+                ):
+                    continue
                 break
 
 

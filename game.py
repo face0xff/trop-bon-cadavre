@@ -168,9 +168,9 @@ Slowest player: {s["slowest_player"]} ({s["slowest_mean_duration"]} seconds in a
             statistics += f"Most timeouts: {s['most_timeouts_player']} ({s['most_timeouts_count']})<br />"
 
         story = ""
-        for message in self.messages:
+        for i, message in enumerate(self.messages):
             message_ = html.escape(message["text"]).replace("\n", "<br />")
-            story += f"<p>{message_}</p>\n"
+            story += f'<div class="message"><div>{i}</div><div>{message_}</div></div>\n'
 
         content = """<html>
 <head>
@@ -179,9 +179,28 @@ Slowest player: {s["slowest_player"]} ({s["slowest_mean_duration"]} seconds in a
     body {
         text-align: justify;
     }
+    hr {
+        color: #fefefe;
+    }
     .col {
         width: 50%%;
         margin: 0 auto;
+    }
+    .message {
+        justify-content: flex-start;
+        display: flex;
+        margin-top: 1em;
+    }
+    .message > div:first-child {
+        text-align: right;
+        flex: 1;
+        color: #777;
+        font-size: 0.6em;
+        margin-right: 1em;
+        margin-top: 0.25em;
+    }
+    .message > div:last-child {
+        flex: 40;
     }
     @media screen and (max-width: 640px) {
         .col {
@@ -193,7 +212,7 @@ Slowest player: {s["slowest_player"]} ({s["slowest_mean_duration"]} seconds in a
 <body>
 <div class="col">
 <h1>%s</h1>
-<p><strong>Authors: %s</strong></p>
+<p><strong>A story written by %s</strong></p>
 <hr />
 <p>
 <strong>Statistics</strong><br />

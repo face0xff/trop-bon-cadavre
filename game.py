@@ -170,7 +170,9 @@ Slowest player: {s["slowest_player"]} ({s["slowest_mean_duration"]} seconds in a
         story = ""
         for i, message in enumerate(self.messages):
             message_ = html.escape(message["text"]).replace("\n", "<br />")
-            story += f'<div class="message"><div>{i}</div><div>{message_}</div></div>\n'
+            story += (
+                f'<div class="message"><div>{i + 1}</div><div>{message_}</div></div>\n'
+            )
 
         content = """<html>
 <head>

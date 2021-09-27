@@ -204,7 +204,7 @@ Slowest player: {s["slowest_player"]} ({s["slowest_mean_duration"]} seconds in a
     .message > div:last-child {
         flex: 40;
     }
-    @media screen and (max-width: 640px) {
+    @media screen and (max-width: 900px) {
         .col {
             width: 100%%;
         }

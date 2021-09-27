@@ -177,6 +177,7 @@ Slowest player: {s["slowest_player"]} ({s["slowest_mean_duration"]} seconds in a
         content = """<html>
 <head>
     <title>Trop Bon Cadavre : %s</title>
+    <meta charset="UTF-8">
     <style>
     body {
         text-align: justify;

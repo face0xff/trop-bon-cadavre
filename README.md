@@ -43,11 +43,13 @@ Then invite the bot to a group channel.
 * Add possibility to leave a game that hasn't started yet (the creator can't leave)
 * Add possibility to adjust time and count after `/new`
 * Add possibility to host a simple HTTP server to serve the HTML export files (also better to centralize CSS, fonts...)
+* Add statistics
+  * Game duration
+  * ...
 
 ### Issues
 
-* HTML render broken on mobile
-  * Responsiveness not always triggered
-  * Encoding issues
+* Some race conditions on edge cases, such as sending a message at the timeout moment
+* HTML render: responsiveness not always triggered on mobile devices
 * Anyone can invite the bot to another group and make it unusable by starting a very long game
   * Provide an option to restrict the bot to a certain channel id?

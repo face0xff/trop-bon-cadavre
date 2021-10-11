@@ -31,10 +31,12 @@ Requires at least Python 3.9.
 python3 -m venv env
 source env/bin/activate
 pip install -r requirements.txt
-python main.py --token "<Your Telegram Bot Token>"
+python main.py --token "<Your Telegram Bot Token>" --name my_cadavre
 ```
 
 Then invite the bot to a group channel.
+
+The `--name` argument is mandatory if you wish to run concurrent instances of the bot. In this case, give them each a name, which can be anything as long as they are distinct.
 
 ## Todo
 

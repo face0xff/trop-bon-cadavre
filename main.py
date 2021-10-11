@@ -1,6 +1,8 @@
 import argparse
+import hashlib
 import os
 import pathlib
+import pickle
 import sys
 import telebot
 import time
@@ -15,6 +17,9 @@ parser.add_argument("--token", help="Bot token")
 parser.add_argument(
     "--savedir", default="saves", help="Directory where messages are saved"
 )
+parser.add_argument(
+    "--name", default="cadavre", help="Optionally give a name to your instance. Mandatory if you have concurrent instances."
+)
 
 args = parser.parse_args()
 
@@ -25,6 +30,8 @@ if not args.token:
 if not pathlib.Path(args.savedir).is_dir():
     print("[x] Please provide a valid directory for savedir.")
     sys.exit(-1)
+
+instance_id = hashlib.sha256(args.name.encode()).hexdigest()[:8]
 
 bot = telebot.TeleBot(args.token, threaded=False)
 game = None
@@ -229,9 +236,14 @@ def get_story_message(message):
 def game_poll():
     global game
     global message_buffer, message_buffer_time
+    global instance_id
 
     if game is None:
         return
+
+    # Periodically save game state
+    with open(f"state/{instance_id}", "wb") as state_file:
+        pickle.dump(game, state_file)
 
     if game.status == State.ENDED and len(message_buffer) > 0:
         title = message_buffer[0]
@@ -336,6 +348,15 @@ Give me a catchy title that's no more than 50 characters.""",
 
         next_turn()
 
+
+# Check if a game is already running. Useful in case the bot crashes and restarts.
+try:
+    with open(f"state/{instance_id}", "rb") as f:
+        saved_game: Game = pickle.load(f)
+        if saved_game.status == State.PLAYING:
+            game = saved_game
+except FileNotFoundError:
+    pass
 
 rt = RepeatedTimer(0.5, game_poll)
 

@@ -8,46 +8,6 @@ import time
 State = Enum("State", "WAITING PLAYING ENDED")
 
 
-def turns(players):
-    """
-    Return a generator that yields the current turn user,
-    along with the next turn user.
-    """
-
-    if len(players) == 1:
-        while True:
-            yield players[0], players[0]
-
-    U1, U2 = players[:], players[:]
-    random.shuffle(U1)
-    while True:
-        random.shuffle(U2)
-        # No "AA" pattern
-        if U1[-1]["id"] != U2[0]["id"]:
-            # No "ABA" pattern (when >= 3 players)
-            if len(players) >= 3 and (
-                U1[-1]["id"] == U2[1]["id"] or U1[-2]["id"] == U2[0]["id"]
-            ):
-                continue
-            break
-
-    while True:
-        for i in range(len(U1)):
-            if i < len(U1) - 1:
-                yield U1[i], U1[i + 1]
-            else:
-                yield U1[-1], U2[0]
-        U1, U2 = U2, U1
-        while True:
-            random.shuffle(U2)
-            if U1[-1]["id"] != U2[0]["id"]:
-                if len(players) >= 3 and (
-                    U1[-1]["id"] == U2[1]["id"] or U1[-2]["id"] == U2[0]["id"]
-                ):
-                    continue
-                break
-
-
 class Game:
     def __init__(self, n_messages, timeout, chat_id, savedir):
         self.n_messages = n_messages
@@ -64,7 +24,9 @@ class Game:
 
         self.current_player = None
         self.next_player = None
-        self.playlist = None
+        self.U1 = None
+        self.U2 = None
+        self.U_i = 0
 
         self.title = ""
         self.messages = []
@@ -78,6 +40,49 @@ class Game:
         self.timeouts = {}
 
         self.status = State.WAITING
+    
+    def init_playlist(self):
+        if len(self.players) == 1:
+            return
+
+        U1, U2 = self.players[:], self.players[:]
+        random.shuffle(U1)
+        while True:
+            random.shuffle(U2)
+            # No "AA" pattern
+            if U1[-1]["id"] != U2[0]["id"]:
+                # No "ABA" pattern (when >= 3 players)
+                if len(self.players) >= 3 and (
+                    U1[-1]["id"] == U2[1]["id"] or U1[-2]["id"] == U2[0]["id"]
+                ):
+                    continue
+                break
+        
+        return
+    
+    def next_playlist_turn(self):
+        if len(self.players) == 1:
+            return self.players[0], self.players[0]
+
+        if self.U_i < len(self.U1):
+            if self.U_i < len(self.U1) - 1:
+                self.U_i += 1
+                return self.U1[self.U_i], self.U1[self.U_i + 1]
+            else:
+                self.U_i += 1
+                return self.U1[-1], self.U2[0]
+        
+        self.U1, self.U2 = self.U2, self.U1
+        while True:
+            random.shuffle(self.U2)
+            if self.U1[-1]["id"] != self.U2[0]["id"]:
+                if len(self.players) >= 3 and (
+                    self.U1[-1]["id"] == self.U2[1]["id"] or self.U1[-2]["id"] == self.U2[0]["id"]
+                ):
+                    continue
+                break
+        
+        self.U_i = 0
 
     def set_title(self, title):
         self.title = title
@@ -90,8 +95,8 @@ class Game:
 
     def start(self):
         self.status = State.PLAYING
-        self.playlist = turns(self.players)
-        self.current_player, self.next_player = next(self.playlist)
+        self.init_playlist()
+        self.current_player, self.next_player = self.next_playlist_turn()
         self.last_time = time.time()
         return self.current_player, self.next_player
 
@@ -110,7 +115,7 @@ class Game:
         self.player_notified_half = False
         self.player_notified_thirty_seconds = False
         self.player_notified_five_seconds = False
-        self.current_player, self.next_player = next(self.playlist)
+        self.current_player, self.next_player = self.next_playlist_turn()
         self.last_time = time.time()
         return self.current_player, self.next_player
 

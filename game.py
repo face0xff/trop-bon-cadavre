@@ -64,25 +64,25 @@ class Game:
         if len(self.players) == 1:
             return self.players[0], self.players[0]
 
-        if self.U_i < len(self.U1):
-            if self.U_i < len(self.U1) - 1:
-                self.U_i += 1
-                return self.U1[self.U_i - 1], self.U1[self.U_i]
-            else:
-                self.U_i += 1
-                return self.U1[-1], self.U2[0]
+        if self.U_i == len(self.U1):        
+            self.U1, self.U2 = self.U2, self.U1
+            while True:
+                random.shuffle(self.U2)
+                if self.U1[-1]["id"] != self.U2[0]["id"]:
+                    if len(self.players) >= 3 and (
+                        self.U1[-1]["id"] == self.U2[1]["id"] or self.U1[-2]["id"] == self.U2[0]["id"]
+                    ):
+                        continue
+                    break
+
+            self.U_i = 0
         
-        self.U1, self.U2 = self.U2, self.U1
-        while True:
-            random.shuffle(self.U2)
-            if self.U1[-1]["id"] != self.U2[0]["id"]:
-                if len(self.players) >= 3 and (
-                    self.U1[-1]["id"] == self.U2[1]["id"] or self.U1[-2]["id"] == self.U2[0]["id"]
-                ):
-                    continue
-                break
-        
-        self.U_i = 0
+        if self.U_i < len(self.U1) - 1:
+            self.U_i += 1
+            return self.U1[self.U_i - 1], self.U1[self.U_i]
+        else:
+            self.U_i += 1
+            return self.U1[-1], self.U2[0]
 
     def set_title(self, title):
         self.title = title

@@ -67,7 +67,7 @@ class Game:
         if self.U_i < len(self.U1):
             if self.U_i < len(self.U1) - 1:
                 self.U_i += 1
-                return self.U1[self.U_i], self.U1[self.U_i + 1]
+                return self.U1[self.U_i - 1], self.U1[self.U_i]
             else:
                 self.U_i += 1
                 return self.U1[-1], self.U2[0]

@@ -352,9 +352,12 @@ Give me a catchy title that's no more than 50 characters.""",
 # Check if a game is already running. Useful in case the bot crashes and restarts.
 try:
     with open(f"state/{instance_id}", "rb") as f:
-        saved_game: Game = pickle.load(f)
-        if saved_game.status == State.PLAYING:
-            game = saved_game
+        try:
+            saved_game: Game = pickle.load(f)
+            if saved_game.status == State.PLAYING:
+                game = saved_game
+        except Exception:
+            os.remove(f"state/{instance_id}")
 except FileNotFoundError:
     pass
 

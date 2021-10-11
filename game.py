@@ -45,15 +45,15 @@ class Game:
         if len(self.players) == 1:
             return
 
-        U1, U2 = self.players[:], self.players[:]
-        random.shuffle(U1)
+        self.U1, self.U2 = self.players[:], self.players[:]
+        random.shuffle(self.U1)
         while True:
-            random.shuffle(U2)
+            random.shuffle(self.U2)
             # No "AA" pattern
-            if U1[-1]["id"] != U2[0]["id"]:
+            if self.U1[-1]["id"] != self.U2[0]["id"]:
                 # No "ABA" pattern (when >= 3 players)
                 if len(self.players) >= 3 and (
-                    U1[-1]["id"] == U2[1]["id"] or U1[-2]["id"] == U2[0]["id"]
+                    self.U1[-1]["id"] == self.U2[1]["id"] or self.U1[-2]["id"] == self.U2[0]["id"]
                 ):
                     continue
                 break

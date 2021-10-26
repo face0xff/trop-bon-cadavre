@@ -51,10 +51,6 @@ The `--name` argument is mandatory if you wish to run concurrent instances of th
 
 ### Issues
 
-* State of game is lost when bot crashes/loses connection (except for the txt story save)
-  * Need to serialize current `Game` into a file and keep it updated
-  * If the bot crashes, it automatically restarts and tries to load the serialized `Game` file if the state was "playing"
-  * Careful of what happens when several instances of the same bot are being run (what if two bots crash at the same time? they should load the right file)
 * Some race conditions on edge cases, such as sending a message at the timeout moment
 * HTML render: responsiveness not always triggered on mobile devices
 * Anyone can invite the bot to another group and make it unusable by starting a very long game
